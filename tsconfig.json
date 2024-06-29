@@ -13,5 +13,5 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-  ]
+, "constants/utils.js", "app/(tabs)/favorites/_layout.tsx", "app/(tabs)/favorites/index.tsx", "app/(tabs)/playlists/_layout.tsx", "app/(tabs)/playlists/index.tsx", "app/(tabs)/_layout.tsx", "app/_layout.tsx", "app/(tabs)/artists/index.tsx", "app/(tabs)/artists/_layout.tsx", "constants/tokens.ts", "constants/layout.ts", "constants/Colors.ts", "app/(tabs)/(songs)/_layout.tsx", "app/(tabs)/(songs)/index.tsx"  ]
 }
