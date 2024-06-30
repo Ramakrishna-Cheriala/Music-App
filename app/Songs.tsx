@@ -2,19 +2,32 @@ import { SongData } from "@/lib/types";
 import { useMusicPlayer } from "./MusicProvider";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useState } from "react";
+import TrackOptions from "@/components/TrackOptions";
+import { colors } from "@/constants/tokens";
 
 const Song = ({ data, onclick }: { data: SongData; onclick: Function }) => {
   console.log(`rendering songs`);
   console.log("------------------------");
-  //   const { setCurrentTrack } = useMusicPlayer();
-
+  const [selectedTrack, setSelectedTrack] = useState<SongData | null>(null);
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const handlePress = (data: SongData) => {
     //   setCurrentTrack(data);
     onclick(data);
   };
 
+  const showOptions = () => {
+    setSelectedTrack(data);
+    setIsModalVisible(true);
+  };
+
+  const hideOptions = () => {
+    setIsModalVisible(false);
+    setSelectedTrack(null);
+  };
+
   return (
-    <View className="bg-gray-950 rounded-lg shadow-md">
+    <View className={`bg-${colors.background} shadow-md`}>
       <TouchableOpacity
         onPress={() => handlePress(data)}
         className="p-3 flex-row items-center"
@@ -58,8 +71,8 @@ const Song = ({ data, onclick }: { data: SongData; onclick: Function }) => {
           </Text>
         </View>
         <TouchableOpacity
-          // onPress={toggleMenu}
-          className="flex items-center justify-center"
+          onPress={showOptions}
+          className="flex items-center justify-center h-14 w-10"
         >
           <MaterialCommunityIcons
             name="dots-vertical"
@@ -68,6 +81,11 @@ const Song = ({ data, onclick }: { data: SongData; onclick: Function }) => {
           />
         </TouchableOpacity>
       </TouchableOpacity>
+      <TrackOptions
+        isVisible={isModalVisible}
+        onClose={hideOptions}
+        track={selectedTrack}
+      />
     </View>
   );
 };

@@ -38,7 +38,7 @@ export declare class MusicInfoResponse {
   album?: string;
   genre?: string;
   picture?: Picture;
-  isLiked: boolean;
+  isLiked?: boolean;
 }
 
 export declare class Picture {

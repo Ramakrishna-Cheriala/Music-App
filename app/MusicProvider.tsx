@@ -15,6 +15,10 @@ interface MusicPlayerContextProps {
   albums: string[];
   artists: string[];
   isPlaying: boolean;
+  // showOptions: boolean;
+  // setShowOptions: (showOptions: boolean) => void;
+  // selectedTrack: SongData | null;
+  // setSelectedTrack: (track: SongData | null) => void;
   setAllTracks: (tracks: SongData[]) => void;
   setCurrentTrack: (track: SongData | null) => void;
   setAlbums: (albums: string[]) => void;
@@ -42,6 +46,8 @@ export const MusicPlayerProvider: React.FC<{ children: React.ReactNode }> = ({
   const [artists, setArtists] = useState<string[]>([]);
   const [likedTracks, setLikedTracks] = useState<SongData[]>([]);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  // const [showOptions, setShowOptions] = useState<boolean>(false);
+  // const [selectedTrack, setSelectedTrack] = useState<SongData | null>(null);
   const [positionMillis, setPositionMillis] = useState<number>(0);
   const [durationMillis, setDurationMillis] = useState<number | undefined>(0);
 
@@ -52,7 +58,7 @@ export const MusicPlayerProvider: React.FC<{ children: React.ReactNode }> = ({
   const nextTrack = useCallback(() => {
     if (currentTrack && allTracks.length > 0) {
       setPositionMillis(0);
-      console.log("positionMillis in next track: ", positionMillis);
+      // console.log("positionMillis in next track: ", positionMillis);
       const currentIndex = allTracks.findIndex(
         (track) => track.id === currentTrack.id
       );
@@ -63,7 +69,7 @@ export const MusicPlayerProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const previousTrack = useCallback(() => {
     setPositionMillis(0);
-    console.log("positionMillis in previous track: ", positionMillis);
+    // console.log("positionMillis in previous track: ", positionMillis);
     if (currentTrack && allTracks.length > 0) {
       const currentIndex = allTracks.findIndex(
         (track) => track.id === currentTrack.id
@@ -77,7 +83,7 @@ export const MusicPlayerProvider: React.FC<{ children: React.ReactNode }> = ({
   const play = async () => {
     try {
       if (currentTrack) {
-        console.log("vundi ra 1");
+        // console.log("vundi ra 1");
         if (audioInstance.current) {
           await audioInstance.current.unloadAsync();
           audioInstance.current = null;
@@ -95,14 +101,14 @@ export const MusicPlayerProvider: React.FC<{ children: React.ReactNode }> = ({
           playbackStatus.current = status;
           if (status.isLoaded && !status.isLooping) {
             setDurationMillis(status.durationMillis);
-            console.log(durationMillis, " duration edi");
+            // console.log(durationMillis, " duration edi");
             setPositionMillis(status.positionMillis);
-            console.log(positionMillis, " position edi");
-            console.log("current tract duration: ", currentTrack.duration);
+            // console.log(positionMillis, " position edi");
+            // console.log("current tract duration: ", currentTrack.duration);
           }
 
           if (status.didJustFinish) {
-            console.log("song ipoendi ra pukkaa");
+            console.log("song ipoendi ra");
             nextTrack();
           }
         });
@@ -138,6 +144,10 @@ export const MusicPlayerProvider: React.FC<{ children: React.ReactNode }> = ({
     albums,
     artists,
     isPlaying,
+    // showOptions,
+    // setShowOptions,
+    // selectedTrack,
+    // setSelectedTrack,
     setAllTracks,
     setCurrentTrack,
     setAlbums,

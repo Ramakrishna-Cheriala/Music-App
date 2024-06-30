@@ -8,7 +8,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const SongScreenLayout = () => {
   return (
     // <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-    <View className={`flex-1 bg-${colors.background} `}>
+    <View className={`flex-1 bg-[#161616] `}>
       <Stack>
         <Stack.Screen
           name="index"

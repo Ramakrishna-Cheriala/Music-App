@@ -1,55 +1,45 @@
 import * as FileSystem from "expo-file-system";
-import { songMetaData } from "./types";
+import { SongData, songMetaData } from "./types";
 
 // const METADATA_DIR = FileSystem.documentDirectory + "metadata/";
 
-const ensureMetadataDirExists = async (METADATA_DIR: string) => {
-  const dirInfo = await FileSystem.getInfoAsync(METADATA_DIR);
-  if (!dirInfo.exists) {
-    await FileSystem.makeDirectoryAsync(METADATA_DIR, { intermediates: true });
-  }
-};
-
-export const saveMetadataToFileSystem = async (
-  id: string,
-  metadata: songMetaData
+export const addAndRemoveFromFavorites = async (
+  currentTrack: SongData,
+  isSongLiked: boolean | undefined
 ) => {
-  const METADATA_DIR = FileSystem.documentDirectory + "metadata/";
+  if (!currentTrack) return;
 
-  await ensureMetadataDirExists(METADATA_DIR);
-  const filePath = `${METADATA_DIR}${id}.json`;
-  await FileSystem.writeAsStringAsync(filePath, JSON.stringify(metadata));
-};
+  try {
+    const metadataFilePath = `${FileSystem.documentDirectory}/metadata/${currentTrack.id}.json`;
 
-export const loadMetadataFromFileSystem = async (id: string) => {
-  const METADATA_DIR = FileSystem.documentDirectory + "metadata/";
-  const filePath = `${METADATA_DIR}${id}.json`;
-  const fileInfo = await FileSystem.getInfoAsync(filePath);
+    const songData = await FileSystem.readAsStringAsync(metadataFilePath);
+    const songMetadata = JSON.parse(songData);
 
-  if (fileInfo.exists) {
-    const metadataJson = await FileSystem.readAsStringAsync(filePath);
-    return JSON.parse(metadataJson);
-  }
-  return null;
-};
+    const newLikedStatus: boolean | undefined = !isSongLiked;
+    console.log("newLikedStatus", newLikedStatus);
+    songMetadata.isLiked = newLikedStatus;
 
-export const loadDataFromDisk = async () => {
-  const METADATA_DIR = FileSystem.documentDirectory + "metadata/";
-  const files = await FileSystem.readDirectoryAsync(METADATA_DIR);
-  for (let index = 0; index < files.length; index++) {
-    const file = files[index];
-    // const json = await FileSystem.readAsStringAsync(
-    //   `${METADATA_DIR}${file}`
+    await FileSystem.writeAsStringAsync(
+      metadataFilePath,
+      JSON.stringify(songMetadata)
+    );
+    console.log(
+      `Song "${currentTrack.title}" liked status is now: ${newLikedStatus}`
+    );
+
+    return newLikedStatus;
+
+    // const updatedTracks = allTracks.map((track) =>
+    //   track.id === currentTrack.id
+    //     ? { ...track, isLiked: newLikedStatus }
+    //     : track
     // );
-    console.log(file);
-  }
-  console.log(files.length);
-};
 
-export const formatMillisecondsToMinutes = (milliseconds: number) => {
-  const totalSeconds = Math.floor(milliseconds / 1000);
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
-  return `${minutes}:${formattedSeconds}`;
+    // setCurrentTrack({ ...currentTrack, isLiked: newLikedStatus });
+
+    // setIsSongLiked(newLikedStatus);
+    // setAllTracks(updatedTracks);
+  } catch (error) {
+    console.error("Error handling liked songs:", error);
+  }
 };

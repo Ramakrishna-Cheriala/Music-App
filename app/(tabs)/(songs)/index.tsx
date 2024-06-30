@@ -69,7 +69,8 @@ async function* loadDataFromFileSystemOnePerSongInChunks(n: number = 100) {
 const SongScreen = () => {
   const [songsList, setSongsList] = useState<SongData[]>([]);
   const [selectedSong, setSelectedSong] = useState<SongData | null>(null);
-  const { setAllTracks, currentTrack, setCurrentTrack } = useMusicPlayer();
+  const { setAllTracks, currentTrack, setCurrentTrack, allTracks } =
+    useMusicPlayer();
 
   useEffect(() => {
     const fetchSongs = async () => {
@@ -100,7 +101,7 @@ const SongScreen = () => {
   return (
     <View className={`m-0 ${currentTrack ? "mb-20" : ""}`}>
       <FlatList
-        data={songsList}
+        data={allTracks}
         keyExtractor={(item, index) => `${index}`}
         renderItem={({ item }) => (
           <MemoizedSong

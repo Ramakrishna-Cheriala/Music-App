@@ -6,12 +6,12 @@ import { StackScreenWithSearchBar } from "@/constants/layout";
 
 const FavoritesScreenLayout = () => {
   return (
-    <View className={`flex-1 bg-${colors.background} mt-5`}>
+    <View className={`flex-1 bg-${colors.background}`}>
       <Stack>
         <Stack.Screen
           name="index"
           options={{
-            headerTransparent: true,
+            headerTransparent: false,
             headerTitle: "Favorites",
             headerTitleStyle: {
               fontSize: 40,

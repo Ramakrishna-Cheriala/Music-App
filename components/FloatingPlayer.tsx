@@ -16,11 +16,11 @@ import {
 } from "react-native-reanimated";
 
 export const FloatingPlayer = () => {
-  console.log("in floating player");
+  // console.log("in floating player");
   const { currentTrack, play, pause, isPlaying, previousTrack, nextTrack } =
     useMusicPlayer();
 
-  console.log(currentTrack?.filename);
+  // console.log(currentTrack?.filename);
 
   if (!currentTrack) return null;
 
@@ -83,7 +83,7 @@ export const FloatingPlayer = () => {
       onHandlerStateChange={onHandlerStateChange}
     >
       <Animated.View
-        className="position-absolute bottom-0 w-full bg-gray-900 rounded-t-xl p-4"
+        className="position-absolute bottom-0 w-full bg-[#282C35] rounded-xl p-4"
         style={animatedStyle}
       >
         <TouchableOpacity onPress={handlePress}>

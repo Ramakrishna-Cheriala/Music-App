@@ -49,6 +49,10 @@ export default function RootLayout() {
             <MusicPlayerProvider>
               <View className="flex-1">
                 <Stack>
+                  {/* <Stack.Screen
+                    name="PlaylistData"
+                    options={{ headerShown: false }}
+                  /> */}
                   <Stack.Screen
                     name="(tabs)"
                     options={{ headerShown: false }}
