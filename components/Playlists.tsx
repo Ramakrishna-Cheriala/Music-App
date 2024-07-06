@@ -5,6 +5,7 @@ import {
   FlatList,
   ActivityIndicator,
   TouchableOpacity,
+  ToastAndroid,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SongData } from "@/lib/types";
@@ -79,9 +80,19 @@ const Playlists: React.FC<OptionsModalProps> = ({
         );
 
         console.log(`Track "${track.title}" added to playlist "${fileName}".`);
+        ToastAndroid.showWithGravity(
+          "Song added to playlist",
+          ToastAndroid.LONG,
+          ToastAndroid.BOTTOM
+        );
       } else {
         console.log(
           `Track "${track.title}" is already in the playlist "${fileName}".`
+        );
+        ToastAndroid.showWithGravity(
+          "Song is already in the playlist",
+          ToastAndroid.LONG,
+          ToastAndroid.BOTTOM
         );
       }
 

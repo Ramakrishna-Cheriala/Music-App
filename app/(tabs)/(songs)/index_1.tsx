@@ -12,11 +12,6 @@ import MusicInfo from "@/lib/MusicInfo";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { songMetaData } from "@/lib/types";
 import { useMusicPlayer } from "@/app/MusicProvider";
-import {
-  loadDataFromDisk,
-  loadMetadataFromFileSystem,
-  saveMetadataToFileSystem,
-} from "@/lib/utils";
 
 const SongScreen: React.FC = () => {
   const [songs, setSongs] = useState<MediaLibrary.Asset[]>([]);
@@ -25,7 +20,7 @@ const SongScreen: React.FC = () => {
   useEffect(() => {
     const fetchSongs = async () => {
       try {
-        loadDataFromDisk();
+        // loadDataFromDisk();
         let allSongs: MediaLibrary.Asset[] = [];
         let hasNextPage = true;
         let nextPage: MediaLibrary.AssetRef = "0";
@@ -84,52 +79,8 @@ const Song = memo(({ data }: { data: MediaLibrary.Asset }) => {
   const [metadata, setMetadata] = useState<songMetaData | null>(null);
   const { setCurrentTrack } = useMusicPlayer();
 
-  useEffect(() => {
-    const fetchMetadata = async () => {
-      // let idModified = data.filename.replace(/\s+/g, "_");
-      // let id = ${idModified}_${data.id};
-      try {
-        const storedMetadata = await loadMetadataFromFileSystem(data.id);
-        let songMetaData = {};
-        if (storedMetadata) {
-          setMetadata(storedMetadata);
-        } else {
-          const fetchedMetadata = await MusicInfo.getMusicInfoAsync(data.uri, {
-            title: true,
-            artist: true,
-            album: true,
-            genre: true,
-            picture: true,
-          });
-          songMetaData = {
-            id: data.id,
-            // @ts-ignore
-            title: fetchedMetadata?.title,
-            // @ts-ignore
-            picture: fetchedMetadata?.picture,
-            // @ts-ignore
-            artist: fetchedMetadata?.artist,
-            filename: data.filename,
-            uri: data.uri,
-            duration: data.duration,
-          };
-          setMetadata(songMetaData);
-          await saveMetadataToFileSystem(data.id, songMetaData);
-        }
-      } catch (error) {
-        console.error("Error fetching metadata:", error);
-      }
-    };
-
-    fetchMetadata();
-  }, [data]);
-
-  const handlePress = () => {
-    setCurrentTrack(metadata);
-  };
-
   return (
-    <TouchableHighlight onPress={handlePress}>
+    <TouchableHighlight>
       <View className="w-full flex flex-row items-center gap-4 border-b-2 border-gray-300 p-2">
         <View className="flex items-center">
           {metadata?.picture?.pictureData ? (

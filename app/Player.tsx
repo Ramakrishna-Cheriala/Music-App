@@ -1,22 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, TouchableOpacity, Dimensions } from "react-native";
+import { View, Text, Image, TouchableOpacity, Modal } from "react-native";
 import { useMusicPlayer } from "./MusicProvider";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import Slider from "@react-native-community/slider";
 import {
-  FontAwesome,
   FontAwesome6,
   Ionicons,
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
-import * as FileSystem from "expo-file-system";
-import { MovingText } from "@/components/MovingText";
-import { useNavigation } from "@react-navigation/native";
+// import { useNavigation } from "@react-navigation/native";
 import TrackOptions from "@/components/TrackOptions";
-import { addAndRemoveFromFavorites } from "@/lib/utils";
-
-const screenWidth = Dimensions.get("window").width;
-const metadataFolderPath = `${FileSystem.documentDirectory}/metadata/`;
+import LikeButton from "@/components/LikeButton";
 
 const formatMillisecondsToMinutes = (totalMilliseconds: number) => {
   const totalSeconds = Math.floor(totalMilliseconds / 1000);
@@ -25,7 +19,12 @@ const formatMillisecondsToMinutes = (totalMilliseconds: number) => {
   return `${minutes.toString().padStart(2, "0")}:${seconds}`;
 };
 
-const PlayerScreen: React.FC = () => {
+interface PlayerScreenProps {
+  isVisible: boolean;
+  onClose: () => void;
+}
+
+const PlayerScreen: React.FC<PlayerScreenProps> = ({ isVisible, onClose }) => {
   const {
     currentTrack,
     play,
@@ -36,15 +35,10 @@ const PlayerScreen: React.FC = () => {
     positionMillis,
     durationMillis,
     setPositionMillis,
-    allTracks,
-    setAllTracks,
-    setCurrentTrack,
   } = useMusicPlayer();
 
-  const navigation = useNavigation();
   const [sliderValue, setSliderValue] = useState<number>(0);
   const [isSeeking, setIsSeeking] = useState<boolean>(false);
-  const [isSongLiked, setIsSongLiked] = useState<boolean | undefined>(false);
   const [isOptionsVisible, setIsOptionsVisible] = useState<boolean>(false);
 
   // Update the slider value based on the playback position.
@@ -54,48 +48,12 @@ const PlayerScreen: React.FC = () => {
     }
   }, [positionMillis, durationMillis, isSeeking]);
 
-  useEffect(() => {
-    if (currentTrack) {
-      console.log("currentTrack", currentTrack.isLiked);
-      setIsSongLiked(currentTrack.isLiked);
-      console.log(currentTrack.title, " - ", currentTrack.isLiked);
-    }
-  }, []);
-
   // Update the positionMillis when the user drags the slider.
   const handleSliderChange = (value: number) => {
     if (durationMillis) {
       const newPositionMillis = value * durationMillis;
       setSliderValue(value); // Temporarily set the slider value to avoid flickering
       setPositionMillis(newPositionMillis); // Update playback position
-    }
-  };
-
-  const handleLikedSongs = async () => {
-    if (!currentTrack) return;
-
-    try {
-      const newLikedStatus = await addAndRemoveFromFavorites(
-        currentTrack,
-        isSongLiked
-      );
-
-      const updatedTracks = allTracks.map((track) =>
-        track.id === currentTrack.id
-          ? { ...track, isLiked: newLikedStatus }
-          : track
-      );
-
-      setCurrentTrack({ ...currentTrack, isLiked: newLikedStatus });
-
-      setIsSongLiked(newLikedStatus);
-      setAllTracks(updatedTracks);
-
-      console.log(
-        `Song "${currentTrack.title}" liked status is now: ${newLikedStatus}`
-      );
-    } catch (error) {
-      console.error("Error handling liked songs:", error);
     }
   };
 
@@ -117,12 +75,17 @@ const PlayerScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaProvider>
+    <Modal
+      visible={isVisible}
+      animationType="slide"
+      transparent={false}
+      onRequestClose={onClose}
+    >
       <SafeAreaProvider className="flex-1">
         <View className="flex-1 w-full bg-[#0F0F0F]">
           <View className="flex-row justify-between items-center p-4 pt-14">
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-              <Ionicons name="chevron-back" size={30} color="white" />
+            <TouchableOpacity onPress={onClose}>
+              <Ionicons name="chevron-down" size={30} color="white" />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => setIsOptionsVisible(true)}>
               <MaterialCommunityIcons
@@ -152,6 +115,7 @@ const PlayerScreen: React.FC = () => {
                     width: "90%",
                     height: "100%",
                     borderRadius: 20,
+                    backgroundColor: "white",
                   }}
                   alt="Album Art"
                   resizeMode="contain"
@@ -175,16 +139,9 @@ const PlayerScreen: React.FC = () => {
                   {currentTrack?.artist}
                 </Text>
               </View>
-              <TouchableOpacity
-                onPress={handleLikedSongs}
-                className="w-1/4 flex justify-center items-center"
-              >
-                {currentTrack?.isLiked ? (
-                  <FontAwesome name="heart" size={25} color="white" />
-                ) : (
-                  <FontAwesome name="heart-o" size={25} color="white" />
-                )}
-              </TouchableOpacity>
+              <View className="w-1/4 flex justify-center items-center">
+                <LikeButton track={currentTrack} />
+              </View>
             </View>
 
             <View className="flex flex-row items-center w-3/4 mb-6">
@@ -235,7 +192,7 @@ const PlayerScreen: React.FC = () => {
           track={currentTrack}
         />
       </SafeAreaProvider>
-    </SafeAreaProvider>
+    </Modal>
   );
 };
 

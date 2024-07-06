@@ -5,10 +5,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as FileSystem from "expo-file-system";
 import { memo, useCallback, useEffect, useState } from "react";
 import { useMusicPlayer } from "@/app/MusicProvider";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { FontAwesome6, MaterialCommunityIcons } from "@expo/vector-icons";
 import { FloatingPlayer } from "@/components/FloatingPlayer";
 import { SongData } from "@/lib/types";
 import Song from "@/app/Songs";
+import Search from "@/components/Search";
+import Buttons from "@/components/Buttons";
 
 const SONGS_LIMIT = 20;
 const CLEAR_ASYNC_STORAGE = false;
@@ -22,7 +24,7 @@ async function* loadDataFromFileSystemOnePerSongInChunks(n: number = 100) {
   }
   const folderInfo = await FileSystem.getInfoAsync(metadataFolderPath);
   if (folderInfo.exists) {
-    console.log(`from file system one per song`);
+    console.log("from file system one per song");
     let allSongsData: SongData[] = [];
     const filesInfo = await FileSystem.readDirectoryAsync(metadataFolderPath);
     // console.log(filesInfo)
@@ -41,7 +43,7 @@ async function* loadDataFromFileSystemOnePerSongInChunks(n: number = 100) {
     // for (const file of filesInfo) {
     //   // console.log(file);
     //   const json = await FileSystem.readAsStringAsync(
-    //     `${metadataFolderPath}${file}`
+    //     ${metadataFolderPath}${file}
     //   );
     //   allSongsData.push(JSON.parse(json));
     // }
@@ -69,8 +71,15 @@ async function* loadDataFromFileSystemOnePerSongInChunks(n: number = 100) {
 const SongScreen = () => {
   const [songsList, setSongsList] = useState<SongData[]>([]);
   const [selectedSong, setSelectedSong] = useState<SongData | null>(null);
-  const { setAllTracks, currentTrack, setCurrentTrack, allTracks } =
-    useMusicPlayer();
+  const [filteredTracks, setFilteredTracks] = useState<SongData[]>([]);
+  const {
+    setAllTracks,
+    currentTrack,
+    setCurrentTrack,
+    allTracks,
+    setSelectedTracks,
+    setIsShuffled,
+  } = useMusicPlayer();
 
   useEffect(() => {
     const fetchSongs = async () => {
@@ -99,15 +108,27 @@ const SongScreen = () => {
     fetchSongs();
   }, [setAllTracks]);
   return (
-    <View className={`m-0 ${currentTrack ? "mb-20" : ""}`}>
+    <View className={`m-0 ${currentTrack ? "mb-56" : "mb-32"}`}>
+      <Search
+        mainData={allTracks}
+        onResults={setFilteredTracks}
+        placeholder="Search..."
+      />
+      <Buttons mainData={allTracks} />
       <FlatList
-        data={allTracks}
+        data={filteredTracks.length > 0 ? filteredTracks : allTracks}
         keyExtractor={(item, index) => `${index}`}
         renderItem={({ item }) => (
           <MemoizedSong
             data={item}
             onclick={() => {
+              setIsShuffled(false);
               console.log(`clicked on ${item.title}`);
+              setSelectedTracks(allTracks);
+              console.log(
+                "current selected tracks is from all songs: ",
+                allTracks.length
+              );
               setCurrentTrack(item);
             }}
           />
@@ -127,7 +148,7 @@ const MemoizedSong = memo(
 // export type SongData = MusicInfoResponse & MediaLibrary.Asset;
 
 async function loadDataFromDisk() {
-  console.log(`in loadDataFromDisk`);
+  console.log("in loadDataFromDisk");
 
   let hasNext = true;
   let after;
@@ -174,7 +195,7 @@ async function loadDataFromFileSystemOnePerSong() {
   }
   const folderInfo = await FileSystem.getInfoAsync(metadataFolderPath);
   if (folderInfo.exists) {
-    console.log(`from file system one per song`);
+    console.log("from file system one per song");
     let allSongsData: SongData[] = [];
     const filesInfo = await FileSystem.readDirectoryAsync(metadataFolderPath);
     // console.log(filesInfo);
@@ -204,5 +225,3 @@ async function loadDataFromFileSystemOnePerSong() {
   }
   return data2;
 }
-
-function loadDataFromMMKV() {}

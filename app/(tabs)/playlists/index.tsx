@@ -1,10 +1,17 @@
-import { View, Text, TouchableOpacity, FlatList } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  FlatList,
+  ToastAndroid,
+} from "react-native";
 import React, { useState, useEffect } from "react";
 import * as FileSystem from "expo-file-system";
 import { colors } from "@/constants/tokens";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import CreatePlaylist from "@/components/CreatePlaylist";
 import { useNavigation } from "@react-navigation/native";
+import { useMusicPlayer } from "@/app/MusicProvider";
 
 const playlistPath = `${FileSystem.documentDirectory}/playlists/`;
 
@@ -13,6 +20,7 @@ const PlayListScreen = () => {
   const [playlists, setPlaylists] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const { currentTrack } = useMusicPlayer();
 
   useEffect(() => {
     const checkForPlaylists = async () => {
@@ -48,10 +56,32 @@ const PlayListScreen = () => {
     navigation.navigate("PlaylistData", { playlist: item });
   };
 
+  const handleDelete = async (playlist: string) => {
+    try {
+      FileSystem.deleteAsync(`${playlistPath}${playlist}`);
+      ToastAndroid.showWithGravity(
+        "Playlist Deleted",
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM
+      );
+      setPlaylists(playlists.filter((item) => item !== playlist));
+    } catch (error) {
+      console.log(error);
+      ToastAndroid.showWithGravity(
+        "Cannot Delete Playlist! Try Again",
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM
+      );
+    }
+  };
+
   const renderPlaylistItem = ({ item }: { item: string }) => (
     <TouchableOpacity onPress={() => handlePress(item)}>
-      <View className="p-4 bg-gray-800 rounded-lg mb-2">
+      <View className="p-4 bg-gray-800 rounded-lg mb-2 flex flex-row justify-between">
         <Text className="text-white">{item.replace(".json", "")}</Text>
+        <TouchableOpacity onPress={() => handleDelete(item)}>
+          <MaterialCommunityIcons name="delete" size={25} color="white" />
+        </TouchableOpacity>
       </View>
     </TouchableOpacity>
   );
@@ -67,7 +97,11 @@ const PlayListScreen = () => {
   }
 
   return (
-    <View className={`flex-1 bg-${colors.background} p-4`}>
+    <View
+      className={`flex-1 bg-${colors.background} p-4 ${
+        currentTrack ? "mb-56" : "mb-32"
+      }`}
+    >
       <FlatList
         data={playlists}
         renderItem={renderPlaylistItem}

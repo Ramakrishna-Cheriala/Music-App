@@ -7,6 +7,7 @@ import {
   TouchableWithoutFeedback,
   PanResponder,
   Image,
+  ToastAndroid,
 } from "react-native";
 import { SongData } from "@/lib/types";
 import {
@@ -31,9 +32,9 @@ const TrackOptions: React.FC<OptionsModalProps> = ({
   track,
 }) => {
   const [addToPlaylist, setAddToPlaylist] = useState(false);
-  const [addToQueue, setAddToQueue] = useState(false);
-  const { allTracks, setAllTracks } = useMusicPlayer();
-  const [isSongLiked, setIsSongLiked] = useState<boolean | undefined>(false);
+  // const [addToQueue, setAddToQueue] = useState(false);
+  const { allTracks, setAllTracks, addToQueue } = useMusicPlayer();
+  // const [isSongLiked, setIsSongLiked] = useState<boolean | undefined>();
 
   // PanResponder to detect dragging
   const panResponder = React.useRef(
@@ -52,15 +53,17 @@ const TrackOptions: React.FC<OptionsModalProps> = ({
   if (!track) return null;
   // setIsSongLiked(track.isLiked);
 
+  console.log("selected track: ", track.title, " is liked: ", track.isLiked);
+
   const handleLikedSongs = async () => {
-    if (!track) return;
-    setIsSongLiked(track.isLiked);
-    console.log("is song liked? ", isSongLiked);
+    // if (!track) return;
+    // setIsSongLiked(track.isLiked);
+    console.log("is song liked? ", track.isLiked);
 
     try {
       const newLikedStatus = await addAndRemoveFromFavorites(
         track,
-        isSongLiked
+        track.isLiked
       );
 
       console.log("newLikedStatus", newLikedStatus);
@@ -71,7 +74,7 @@ const TrackOptions: React.FC<OptionsModalProps> = ({
 
       setAllTracks(updatedTracks);
       track.isLiked = newLikedStatus;
-      setIsSongLiked(newLikedStatus);
+      // setIsSongLiked(newLikedStatus);
 
       console.log(
         `Song "${track.title}" liked status is now: ${newLikedStatus}`
@@ -81,6 +84,17 @@ const TrackOptions: React.FC<OptionsModalProps> = ({
     } finally {
       onClose();
     }
+  };
+
+  const handleQueue = async () => {
+    console.log("track adding to queue: ", track.title);
+    addToQueue(track);
+    onClose();
+    ToastAndroid.showWithGravity(
+      "Track added to queue",
+      ToastAndroid.SHORT,
+      ToastAndroid.BOTTOM
+    );
   };
 
   return (
@@ -170,34 +184,18 @@ const TrackOptions: React.FC<OptionsModalProps> = ({
                   </View>
                 </TouchableOpacity>
 
-                <TouchableOpacity
-                  className="py-2 mt-3"
-                  onPress={() => console.log("Add to Queue")}
-                >
+                <TouchableOpacity className="py-2 mt-3" onPress={handleQueue}>
                   <View className="flex flex-row items-center pb-3 border-b border-gray-600">
-                    {addToQueue ? (
-                      <>
-                        <MaterialIcons
-                          name="queue-music"
-                          size={25}
-                          color="white"
-                        />
-                        <Text className="text-green-500 text-base ml-3">
-                          Add to Queue
-                        </Text>
-                      </>
-                    ) : (
-                      <>
-                        <MaterialIcons
-                          name="queue-music"
-                          size={25}
-                          color="red"
-                        />
-                        <Text className="text-red-500 text-base ml-3">
-                          Remove from Queue
-                        </Text>
-                      </>
-                    )}
+                    <>
+                      <MaterialIcons
+                        name="queue-music"
+                        size={25}
+                        color="white"
+                      />
+                      <Text className="text-white text-base ml-3">
+                        Add to Queue
+                      </Text>
+                    </>
                   </View>
                 </TouchableOpacity>
 

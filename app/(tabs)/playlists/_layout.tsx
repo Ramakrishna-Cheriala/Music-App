@@ -5,12 +5,12 @@ import { colors } from "@/constants/tokens";
 import { StackScreenWithSearchBar } from "@/constants/layout";
 import { createStackNavigator } from "@react-navigation/stack";
 import PlayListScreen from "./index";
-import PlaylistData from "@/app/PlaylistData";
+import PlaylistData from "@/app/(tabs)/playlists/PlaylistData";
 
 const Stack = createStackNavigator();
 const PlaylistScreenLayout = () => {
   return (
-    <View className={`flex-1 bg-${colors.background} mt-5`}>
+    <View className={`flex-1 bg-${colors.background}`}>
       {/* <Stack>
         <Stack.Screen
           name="index"
@@ -31,7 +31,7 @@ const PlaylistScreenLayout = () => {
           component={PlayListScreen}
           options={{
             headerTitleStyle: {
-              fontSize: 24,
+              fontSize: 40,
               fontWeight: "bold",
             },
           }}

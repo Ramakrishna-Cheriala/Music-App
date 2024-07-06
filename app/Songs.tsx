@@ -7,7 +7,7 @@ import TrackOptions from "@/components/TrackOptions";
 import { colors } from "@/constants/tokens";
 
 const Song = ({ data, onclick }: { data: SongData; onclick: Function }) => {
-  console.log(`rendering songs`);
+  console.log(`rendering songs ${data.title}`);
   console.log("------------------------");
   const [selectedTrack, setSelectedTrack] = useState<SongData | null>(null);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
@@ -41,7 +41,7 @@ const Song = ({ data, onclick }: { data: SongData; onclick: Function }) => {
             />
           ) : (
             <Image
-              className="w-14 h-14 rounded-lg"
+              className="w-14 h-14 rounded-lg bg-white"
               source={require("@/assets/images/itunes.png")}
               alt="Album Art"
             />
